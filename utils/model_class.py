@@ -33,7 +33,6 @@ class Model:
             elif self.cfg["AMFS"] == "2SeqLM":
                 self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name).to(self._device)
             self.loaded = True
-        
 
     def model_inf(self, input_text:str, mother_lang:str = "eng_Latn")->str:
         match self.model_key:
@@ -64,23 +63,52 @@ class Model:
 
             case _:
                 raise NotImplementedError(f"Inference not implemented for {self.model_key}")
+    
+    def unload(self):
+        if self._model:
+            del self._model
+            self._model = None
+        
+        if self.tokenizer:
+            del self.tokenizer
+            self.tokenizer = None
+        
+        self.loaded = False
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
+        import gc
+        gc.collect()
+    def __del__(self):
+        self.unload()
 
 def sentiments_eval(model_key:str, phrase:str)->str:
     model = Model(model_key=model_key)
     model.model_load()
-    return model.model_inf(phrase)
+    message = model.model_inf(phrase)
+    model.unload()
+    return message
+    
 
 def translator(model_key:str, phrase:str, language:str)->str:
     model = Model(model_key=model_key)
     model.model_load()
-    return model.model_inf(phrase,mother_lang=language)
+    message = model.model_inf(phrase,mother_lang=language)
+    model.unload()
+    return message
 
 def language_detector(model_key:str, phrase:str)->str:
     model = Model(model_key=model_key)
     model.model_load()
-    return model.model_inf(phrase)
+    message = model.model_inf(phrase)
+    model.unload()
+    return message
 
 def get_context():
+    # model = Model(model_key=)
+    # model.model_load()
+    # return model.model_inf(phrase)
     ...
 
 def urgent_notif():
