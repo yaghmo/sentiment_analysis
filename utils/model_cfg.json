@@ -1,0 +1,10 @@
+{  
+    "rsa": 
+        {"model_name": "tabularisai/robust-sentiment-analysis", "AMFS": "Classification", "purpose":"A model classify a text input into 5 classes based on the sentiment analized"},
+    "fb_nllb_1.3":
+        {"model_name": "facebook/nllb-200-1.3B", "AMFS": "2SeqLM", "purpose": "A model that translates text input into English"},
+    "fb_nllb_d_0.6":
+        {"model_name": "facebook/nllb-200-distilled-600M", "AMFS": "2SeqLM", "purpose": "A model that translates text input into English"},
+    "xlm_rbld":
+        {"model_name": "papluca/xlm-roberta-base-language-detection", "AMFS": "Classification", "purpose": "A model that detects the language"}
+}
