@@ -1,4 +1,5 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM
+from auto_gptq import AutoGPTQForCausalLM
 import torch
 import json
 
@@ -32,9 +33,18 @@ class Model:
                 self.labels = self._model.config.id2label
             elif self.cfg["AMFS"] == "2SeqLM":
                 self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name).to(self._device)
+            elif self.cofg["AMFS"] == "GPTQ":
+                self._model = AutoGPTQForCausalLM.from_quantized(
+                    self.model_name,
+                    device=self._device,
+                    use_safetensors=True,
+                    trust_remote_code=True,
+                    inject_fused_attention=False,
+                    inject_fused_mlp=False,
+                )
             self.loaded = True
 
-    def model_inf(self, input_text:str, mother_lang:str = "eng_Latn")->str:
+    def model_inf(self, input_text:str, mother_lang:str = "eng_Latn",sentiment_label: str = None)->str:
         match self.model_key:
             case "rsa":
                 inputs = self.tokenizer(input_text, return_tensors="pt").to(self._device)
@@ -46,20 +56,46 @@ class Model:
 
             case "fb_nllb_1.3" | "fb_nllb_d_0.6":
                 self.tokenizer.src_lang = mother_lang
-                inputs = self.tokenizer(input_text, return_tensors="pt").to(self._device)            
-                translated = self._model.generate(**inputs,forced_bos_token_id = self.tokenizer.convert_tokens_to_ids("eng_Latn"))
+                inputs = self.tokenizer(input_text, return_tensors="pt").to(self._device)        
+                with torch.no_grad():    
+                    translated = self._model.generate(**inputs,forced_bos_token_id = self.tokenizer.convert_tokens_to_ids("eng_Latn"))
                 return self.tokenizer.decode(translated[0], skip_special_tokens=True)
 
             case "xlm_rbld":
                 with open("utils/lang_map.json", "r", encoding="utf-8") as f:
                     FT_TO_NLLB = json.load(f)
-                self.labels = self._model.config.id2label
                 inputs = self.tokenizer(input_text, return_tensors="pt", truncation=True).to(self._device)
                 with torch.no_grad():
                     outputs = self._model(**inputs)
                     probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
                     pred_id = int(torch.argmax(probs, dim=-1))
                 return FT_TO_NLLB.get(self.labels[pred_id],"unkown")
+            
+            case "mistral_gptq_4b":
+                with f open("utils/system_prompt.txt") as f:
+                SYSTEM_PROMPT  = f.read()
+                user_content = (
+                    SYSTEM_PROMPT
+                    + "\n\nNow analyze the following input and respond according to the rules above.\n\n"
+                    + f'feedback_text: "{input_text}"\n'
+                    + f'sentiment_label: "{sentiment_label}"\n\n'
+                    + "Remember: respond with EXACTLY 'irrelevant' if it is out of scope or not negative, "
+                    "otherwise respond with a short apology message as described."
+                )
+                messages = [
+                    {"role": "user", "content": user_content}
+                ]
+                prompt_text = tokenizer.apply_chat_template(messages,tokenize=False,add_generation_prompt=True)
+                inputs = tokenizer(prompt_text, return_tensors="pt").to(self._device)
+
+                with torch.inference_mode():
+                    output = self._model.generate(**inputs,max_new_tokens=128,do_sample=False,pad_token_id=self.tokenizer.eos_token_id)
+                    generated_ids = output[0][inputs["input_ids"].shape[-1]:]
+                    response = self.tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
+                    lower = response.lower().strip()
+                if lower.startswith("irrelevant"):
+                    return "irrelevant"
+                return response
 
             case _:
                 raise NotImplementedError(f"Inference not implemented for {self.model_key}")
@@ -94,25 +130,20 @@ def sentiments_eval(model_key:str, phrase:str)->str:
 def translator(model_key:str, phrase:str, language:str)->str:
     model = Model(model_key=model_key)
     model.model_load()
-    message = model.model_inf(phrase,mother_lang=language)
+    message = model.model_inf(input_text=phrase,mother_lang=language)
     model.unload()
     return message
 
 def language_detector(model_key:str, phrase:str)->str:
     model = Model(model_key=model_key)
     model.model_load()
-    message = model.model_inf(phrase)
+    message = model.model_inf(input_text=phrase)
     model.unload()
     return message
 
-def get_context():
-    # model = Model(model_key=)
-    # model.model_load()
-    # return model.model_inf(phrase)
-    ...
-
-def urgent_notif():
-    ...
-
-def typical_answer():
-    ...
+def answer(model_key:str, phrase:str, sentiment:str)->str:
+    model = Model(model_key=model_key)
+    model.model_load()
+    message = model.model_inf(input_text=phrase,sentiment_label=sentiment)
+    model.unload()
+    return message
