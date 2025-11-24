@@ -3,29 +3,30 @@ from utils.model_class import translator, language_detector, sentiments_eval, an
 
 
 st.set_page_config(
-    page_title="My App",
+    page_title="Chatbot",
     page_icon="🤖",
     layout="centered"
 )
 
-# Title
-st.title("🤖 My Streamlit App")
 
-# Optional: Add a subtitle or description
-st.markdown("Enter your text below and click the button to process it.")
+st.title("Yaghmood's tourism agency")
 
-# Input field
-user_input = st.text_input(
+
+st.markdown("This tool analyzes customer feedback, detects sentiment, checks relevance, and generates an appropriate response.")
+
+
+user_input = st.text_area(
     label="Enter your text:",
-    placeholder="Type something here...",
+    placeholder="Type your feedback here...",
+    height=120,
     max_chars=500
 )
 
 
-# Button
+
 if st.button("Analyze Sentiment", type="primary"):
     if user_input.strip():
-        # Create a placeholder for loading message
+
         loading_placeholder = st.empty()
         result_placeholder = st.empty()
 
@@ -47,17 +48,11 @@ if st.button("Analyze Sentiment", type="primary"):
             st.markdown(f"#### 😐 {result}")
     else:
         st.warning("⚠️ Please enter some text first!")
-    if result in ['Positive', 'Very Positive']:
-        st.write(f'## Comment is good, not important.')
-    else:
-        with st.spinner("Checking the bullshit..."):
+    if result not in ['Positive', 'Very Positive']:
+        with st.spinner("Checking the context..."):
                 context = answer(model_key="mistral_gptq_4b",phrase=user_input, sentiment=result)
         if context == "irrelevant":
-            st.write(f"### The BS is irrelevant")
+            st.write(f"### The user complaint is irrelevant to the company context.")
         else:
             st.write(f'## Typical appology:')
             st.markdown(f"### {context}")
-
-# Optional: Add a footer or additional info
-st.markdown("---")
-st.caption("Built with Streamlit 🎈")
