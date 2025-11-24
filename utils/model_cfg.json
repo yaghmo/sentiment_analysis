@@ -8,5 +8,5 @@
     "xlm_rbld":
         {"model_name": "papluca/xlm-roberta-base-language-detection", "AMFS": "Classification", "purpose": "A model that detects the language"},
     "mistral_gptq_4b":
-    {"model_name": "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit", "AMFS": "GPTQ", "purpose": "A model that understands context and answers back."}
+        {"model_name": "RedHatAI/Mistral-7B-Instruct-v0.3-GPTQ-4bit", "AMFS": "GPTQ", "purpose": "A model that understands context and answers back."}
     }
