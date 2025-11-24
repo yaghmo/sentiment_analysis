@@ -33,15 +33,14 @@ class Model:
                 self.labels = self._model.config.id2label
             elif self.cfg["AMFS"] == "2SeqLM":
                 self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name).to(self._device)
-            elif self.cofg["AMFS"] == "GPTQ":
+            elif self.cfg["AMFS"] == "GPTQ":
                 self._model = AutoGPTQForCausalLM.from_quantized(
                     self.model_name,
-                    device=self._device,
                     use_safetensors=True,
                     trust_remote_code=True,
                     inject_fused_attention=False,
                     inject_fused_mlp=False,
-                )
+                ).to(self._device)
             self.loaded = True
 
     def model_inf(self, input_text:str, mother_lang:str = "eng_Latn",sentiment_label: str = None)->str:
@@ -72,8 +71,8 @@ class Model:
                 return FT_TO_NLLB.get(self.labels[pred_id],"unkown")
             
             case "mistral_gptq_4b":
-                with f open("utils/system_prompt.txt") as f:
-                SYSTEM_PROMPT  = f.read()
+                with open("utils/system_prompt.txt", "r", encoding="utf-8") as f:
+                    SYSTEM_PROMPT  = f.read()
                 user_content = (
                     SYSTEM_PROMPT
                     + "\n\nNow analyze the following input and respond according to the rules above.\n\n"
@@ -85,8 +84,8 @@ class Model:
                 messages = [
                     {"role": "user", "content": user_content}
                 ]
-                prompt_text = tokenizer.apply_chat_template(messages,tokenize=False,add_generation_prompt=True)
-                inputs = tokenizer(prompt_text, return_tensors="pt").to(self._device)
+                prompt_text = self.tokenizer.apply_chat_template(messages,tokenize=False,add_generation_prompt=True)
+                inputs = self.tokenizer(prompt_text, return_tensors="pt").to(self._device)
 
                 with torch.inference_mode():
                     output = self._model.generate(**inputs,max_new_tokens=128,do_sample=False,pad_token_id=self.tokenizer.eos_token_id)
