@@ -8,19 +8,19 @@ This project is an experimental chatbot designed to analyze customer feedback, d
 
 ---
 
-## 🚀 Highlights
+## Highlights
 
-- 🔎 Automatic sentiment detection using a robust multi-class classifier  
-- 🌍 Automatic language detection & translation to English for multilingual feedback  
-- 🎯 Context-aware relevance judgment using a Mistral 7B GPTQ model  
-- 🧠 Fully customizable system prompt (edit `utils/system_promt.txt` to change assistant behavior instantly)  
-- 🤖 End-to-end chatbot pipeline combining sentiment, relevance, and apology generation  
-- ⚡ GPU-accelerated inference (recommended: **6GB VRAM or more**)  
-- 🖥️ Simple Streamlit UI for testing and demonstration  
+- Automatic sentiment detection using a robust multi-class classifier  
+- Automatic language detection & translation to English for multilingual feedback  
+- Context-aware relevance judgment using a Mistral 7B GPTQ model  
+- Fully customizable system prompt (edit `utils/system_promt.txt` to change assistant behavior instantly)  
+- End-to-end chatbot pipeline combining sentiment, relevance, and apology generation  
+- GPU-accelerated inference (recommended: **6GB VRAM or more**)  
+- Simple Streamlit UI for testing and demonstration  
 
 ---
 
-## 🧩 Models Used
+## Models Used
 
 All models run on GPU:
 
@@ -33,7 +33,7 @@ All models run on GPU:
 
 ---
 
-## 📦 Installation
+## Installation
 
 It’s recommended to use a dedicated environment (conda or Python venv).
 
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 ```
 
 
-## 🧪 Usage
+## Usage
 
 After installing dependencies, launch the interface with:
 
@@ -74,7 +74,7 @@ The system will then:
     - a short apology message
 
 
-## 📸 Examples
+## Examples
 Example 1 — Relevant & Negative:
 i am very angry the flight to sweden from france at 8am was delayed by 2 hours and the hotel is now full while i already booked 2 days!
 
@@ -95,7 +95,7 @@ Example 3 — Positive using French language:
 ![Positive](image-2.png)
 
 
-## 📚 Citations
+## Citations
 
 Please cite the following models and authors if you use this project in academic, research, or public work.
 

@@ -117,32 +117,3 @@ class Model:
         gc.collect()
     def __del__(self):
         self.unload()
-
-def sentiments_eval(model_key:str, phrase:str)->str:
-    model = Model(model_key=model_key)
-    model.model_load()
-    message = model.model_inf(phrase)
-    model.unload()
-    return message
-    
-
-def translator(model_key:str, phrase:str, language:str)->str:
-    model = Model(model_key=model_key)
-    model.model_load()
-    message = model.model_inf(input_text=phrase,mother_lang=language)
-    model.unload()
-    return message
-
-def language_detector(model_key:str, phrase:str)->str:
-    model = Model(model_key=model_key)
-    model.model_load()
-    message = model.model_inf(input_text=phrase)
-    model.unload()
-    return message
-
-def answer(model_key:str, phrase:str, sentiment:str)->str:
-    model = Model(model_key=model_key)
-    model.model_load()
-    message = model.model_inf(input_text=phrase,sentiment_label=sentiment)
-    model.unload()
-    return message

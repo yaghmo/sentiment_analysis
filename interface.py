@@ -1,6 +1,34 @@
 import streamlit as st
-from utils.model_class import translator, language_detector, sentiments_eval, answer
+from utils.model_class import Model
 
+def sentiments_eval(model_key:str, phrase:str)->str:
+    model = Model(model_key=model_key)
+    model.model_load()
+    message = model.model_inf(phrase)
+    model.unload()
+    return message
+    
+
+def translator(model_key:str, phrase:str, language:str)->str:
+    model = Model(model_key=model_key)
+    model.model_load()
+    message = model.model_inf(input_text=phrase,mother_lang=language)
+    model.unload()
+    return message
+
+def language_detector(model_key:str, phrase:str)->str:
+    model = Model(model_key=model_key)
+    model.model_load()
+    message = model.model_inf(input_text=phrase)
+    model.unload()
+    return message
+
+def answer(model_key:str, phrase:str, sentiment:str)->str:
+    model = Model(model_key=model_key)
+    model.model_load()
+    message = model.model_inf(input_text=phrase,sentiment_label=sentiment)
+    model.unload()
+    return message
 
 st.set_page_config(
     page_title="Chatbot",
@@ -52,7 +80,7 @@ if st.button("Analyze Sentiment", type="primary"):
         with st.spinner("Checking the context..."):
                 context = answer(model_key="mistral_gptq_4b",phrase=user_input, sentiment=result)
         if context == "irrelevant":
-            st.write(f"### The user complaint is irrelevant to the company context.")
+            st.write(f"### The user complaint is irrelevant to the agency context.")
         else:
             st.write(f'## Typical appology:')
             st.markdown(f"### {context}")
