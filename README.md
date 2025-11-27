@@ -81,7 +81,7 @@ i am very angry the flight to sweden from france at 8am was delayed by 2 hours a
 Expected:
 A short apology response with contact instructions.
 
-![Relevant and Negative](src\image.png)
+![Relevant and Negative](src/image.png)
 
 Example 2 — Negative but Irrelevant (cars):
 i hate this agency so much i cant even find cars to rent
@@ -89,10 +89,10 @@ i hate this agency so much i cant even find cars to rent
 Expected:
 irrelevant
 
-![Negative but Irrelevant](src\image-1.png)
+![Negative but Irrelevant](src/image-1.png)
 
 Example 3 — Positive using French language:
-![Positive](src\image-2.png)
+![Positive](src/image-2.png)
 
 
 ## Citations
