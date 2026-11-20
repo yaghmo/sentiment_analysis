@@ -1,5 +1,7 @@
 # Yaghmood Feedback Sentiment & Relevance Classifier
 
+[![Multilingual sentiment analysis: the 20-second video (click to play)](assets/brag.jpg)](assets/brag.mp4)
+
 This project is an experimental chatbot designed to analyze customer feedback, determine the sentiment, check whether the complaint is relevant to the agency’s context, and optionally generate a short and polite response. It combines multiple AI models (sentiment classifier, language detector, translator, and a Mistral-7B assistant) to create a complete multi-step triage pipeline.
 
 > **Important:**  
